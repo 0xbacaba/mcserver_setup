@@ -5,7 +5,7 @@ setup_dir=$(echo $0 | sed "s/`basename $0`\$//")
 cd $setup_dir
 
 # get the latest available server version
-latest=`ls versions | sort -V | tail -n 1 | sed 's/.jar$//'`
+latest=`ls versions | grep '.jar' | sort -V | tail -n 1 | sed 's/.jar$//'`
 
 read -p "Version [$latest]: " version
 version=${version:-$latest}
