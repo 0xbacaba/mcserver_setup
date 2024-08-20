@@ -4,15 +4,72 @@
 setup_dir=$(echo $0 | sed "s/`basename $0`\$//")
 cd $setup_dir
 
-# get the latest available server version
-latest=`ls versions | grep '.jar' | sort -V | tail -n 1 | sed 's/.jar$//'`
+
+install_paper_version() {
+	local version=$1
+
+	local paperapi="https://api.papermc.io/v2/projects/paper"
+
+	echo "fetching latest build for $version..."
+	local latest_build=`curl "$paperapi/versions/$version/builds" -Ls | jq '.builds[-1].build'`
+
+	if [ "$latest_build" == "null" ]; then
+		echo -e "\e[31merror: no build for this version\e[0m"
+		exit
+	fi
+	echo -en "\e[32mgot build $latest_build. Proceed? [Y/n] \e[0m"
+	read proceed
+	local proceed=${proceed:-Y}
+
+	if [ "${proceed^^}" != "Y" ]; then
+		exit
+	fi
+
+	echo "installing paper-$version-$latest_build.jar..."
+	curl -fsSL "$paperapi/versions/$version/builds/$latest_build/downloads/paper-$version-$latest_build.jar" -o versions/$version.jar
+	
+	if [ "$?" != "0" ]; then
+		echo -e "\e[31minstallation failed: $?\e[0m"
+		exit
+	fi
+
+	echo -e "\e[32minstallation successful\e[0m"
+	get_latest_version
+}
+get_latest_version() {
+	# get the latest available server version
+	latest=`ls versions | grep '.jar' | sort -V | tail -n 1 | sed 's/.jar$//'`
+}
+
+get_latest_version
+
+if [ -z "$latest" ]; then
+	echo -en "\e[33mwarning: no server executables found. Would you like to install paper? [Y/n] \e[0m"
+	read install_paper
+	install_paper=${install_paper:-Y}
+
+	if [ "${install_paper^^}" != "Y" ]; then
+		exit
+	fi
+
+	read -p "Minecraft Version: " install_version
+
+	install_paper_version $install_version
+fi
 
 read -p "Version [$latest]: " version
 version=${version:-$latest}
 
 if [ ! -f "versions/$version.jar" ]; then
-	echo "$version doesn't exist"
-	exit
+	echo -en "\e[33mwarning: $version doesn't exist. Install paper? [Y/n] \e[0m"
+	read install_paper
+	install_paper=${install_paper:-Y}
+
+	if [ "${install_paper^^}" != "Y" ]; then
+		exit
+	fi
+	
+	install_paper_version $version
 fi
 
 if [ ! -d "plugins/$version" ]; then
