@@ -1,0 +1,8 @@
+/plugins/*.jar
+/plugins/*/*.jar
+/plugins/*/bStats
+/plugins/.*
+/plugins/*/.*
+/versions/*.jar
+/utils
+/defaults/ops.json
