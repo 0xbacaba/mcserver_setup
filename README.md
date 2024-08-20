@@ -7,7 +7,9 @@ cd $server_root
 git clone https://github.com/LetsDuck2210/mcserver_setup setup
 
 
-# Install server versions to $server_root/setup/versions. Example:
+# Install server versions to $server_root/setup/versions. 
+# The script can automatically install paper servers for unavailable versions
+# Example:
 version=1.21.1
 build=39
 url="https://api.papermc.io/v2/projects/paper/versions/$version/builds/$build/downloads/paper-$version-$build.jar"
