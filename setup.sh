@@ -1,5 +1,31 @@
 #!/bin/bash
 
+exists() {
+	if [ -z "`command -v $1`" ]; then
+		return 1
+	fi
+	return 0
+}
+require() {
+	local program=$1
+	
+	if ! exists $program; then
+		echo -e "\e[31merror: $program is required but doesn't exist\e[0m"
+		exit
+	fi
+}
+require_optional() {
+	local program=$1
+
+	if ! exists $program; then
+		echo -e "\e[33mwarning: $program doesn't exist, some features might not be available\e[0m"
+	fi
+}
+
+require sed
+require_optional curl
+require_optional jq
+
 # ensure starting in setup directory
 setup_dir=$(echo $0 | sed "s/`basename $0`\$//")
 cd $setup_dir
@@ -7,6 +33,11 @@ cd $setup_dir
 
 install_paper_version() {
 	local version=$1
+
+	if ! exists curl || ! exists jq; then
+		echo -e "\e[31merror: missing requirements to install paper. Please install \e[34mcurl\e[31m and \e[34mjq\e[0m"
+		exit
+	fi
 
 	local paperapi="https://api.papermc.io/v2/projects/paper"
 
