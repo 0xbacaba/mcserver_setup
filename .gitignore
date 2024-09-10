@@ -3,6 +3,7 @@
 /plugins/*/bStats
 /plugins/.*
 /plugins/*/.*
+/plugins/*
 /versions/*.jar
 /utils
 /defaults/ops.json
