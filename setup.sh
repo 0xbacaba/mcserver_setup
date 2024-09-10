@@ -1,28 +1,7 @@
 #!/bin/bash
 
-exists() {
-	if [ -z "`command -v $1`" ]; then
-		return 1
-	fi
-	return 0
-}
-require() {
-	local program=$1
-	
-	if ! exists $program; then
-		echo -e "\e[31merror: $program is required but doesn't exist\e[0m"
-		exit
-	fi
-}
-require_optional() {
-	local program=$1
+source utils.sh
 
-	if ! exists $program; then
-		echo -e "\e[33mwarning: $program doesn't exist, some features might not be available\e[0m"
-	fi
-}
-
-require sed
 require_optional curl
 require_optional jq
 
@@ -30,49 +9,7 @@ require_optional jq
 setup_dir=$(echo $0 | sed "s/`basename $0`\$//")
 cd $setup_dir
 
-
-install_paper_version() {
-	local version=$1
-
-	if ! exists curl || ! exists jq; then
-		echo -e "\e[31merror: missing requirements to install paper. Please install \e[34mcurl\e[31m and \e[34mjq\e[0m"
-		exit
-	fi
-
-	local paperapi="https://api.papermc.io/v2/projects/paper"
-
-	echo "fetching latest build for $version..."
-	local latest_build=`curl "$paperapi/versions/$version/builds" -Ls | jq '.builds[-1].build'`
-
-	if [ "$latest_build" == "null" ]; then
-		echo -e "\e[31merror: no build for this version\e[0m"
-		exit
-	fi
-	echo -en "\e[32mgot build $latest_build. Proceed? [Y/n] \e[0m"
-	read proceed
-	local proceed=${proceed:-Y}
-
-	if [ "${proceed^^}" != "Y" ]; then
-		exit
-	fi
-
-	echo "installing paper-$version-$latest_build.jar..."
-	curl -fsSL "$paperapi/versions/$version/builds/$latest_build/downloads/paper-$version-$latest_build.jar" -o versions/$version.jar
-	
-	if [ "$?" != "0" ]; then
-		echo -e "\e[31minstallation failed: $?\e[0m"
-		exit
-	fi
-
-	echo -e "\e[32minstallation successful\e[0m"
-	get_latest_version
-}
-get_latest_version() {
-	# get the latest available server version
-	latest=`ls versions | grep '.jar' | sort -V | tail -n 1 | sed 's/.jar$//'`
-}
-
-get_latest_version
+latest=`get_latest_version`
 
 if [ -z "$latest" ]; then
 	echo -en "\e[33mwarning: no server executables found. Would you like to install paper? [Y/n] \e[0m"
@@ -85,7 +22,10 @@ if [ -z "$latest" ]; then
 
 	read -p "Minecraft Version: " install_version
 
-	install_paper_version $install_version
+	if ! install_paper_version $install_version; then
+		exit
+	fi
+	latest=`get_latest_version`
 fi
 
 read -p "Version [$latest]: " version
@@ -100,7 +40,9 @@ if [ ! -f "versions/$version.jar" ]; then
 		exit
 	fi
 	
-	install_paper_version $version
+	if ! install_paper_version $version; then
+		exit
+	fi
 fi
 
 if [ ! -d "plugins/$version" ]; then
