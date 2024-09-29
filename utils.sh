@@ -1,5 +1,22 @@
 #!/bin/bash
 
+function is_windows() {
+	if [[ `uname -o` == *"Linux"* ]]; then
+		return 1
+	fi
+
+	return 0
+}
+function symlink() {
+	target=$1
+	link_name=$2
+	if ! is_windows; then
+		ln -rs $target $link_name
+		return $?
+	fi
+
+	powershell.exe -c "cmd.exe /c mklink /J $link_name $target"
+}
 function exists() {
 	if [ -z "`command -v $1`" ]; then
 		return 1
