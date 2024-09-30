@@ -32,7 +32,8 @@ Example:
 ```bash
 curl -fsSL https://hangarcdn.papermc.io/plugins/EngineHub/WorldEdit/versions/7.3.6/PAPER/worldedit-bukkit-7.3.6.jar -o $server_root/setup/plugins/worldedit-7.3.6.jar
 
-ln -rs $server_root/setup/plugins/worldedit-7.3.6.jar $server_root/setup/plugins/$version/worldedit.jar
+source $server_root/utils.sh
+symlink $server_root/setup/plugins/worldedit-7.3.6.jar $server_root/setup/plugins/$version/worldedit.jar
 ```
 
 If no plugins folder for a specific version exists, the script will either:
