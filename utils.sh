@@ -7,6 +7,30 @@ function is_windows() {
 
 	return 0
 }
+function to_win_path() {
+	path=$1
+
+	echo "$path" | sed 's/\//\\/g'
+}
+function win_symlink() {
+	target=$1
+	link_name=$2
+
+	win_target=`to_win_path $target`
+	win_link_name=`to_win_path $link_name`
+
+	if [ -f $target ]; then
+		# symbolic file links don't seem to be supported
+		powershell.exe -c "cmd.exe /c mklink /H $win_link_name $win_target"
+	elif [ -d $target ]; then
+		powershell.exe -c "cmd.exe /c mklink /J $win_link_name $win_target"
+	else
+		echo -en "\e[31merror: $target doesn't exist\e[0m"
+		return 1
+	fi
+
+	return $?
+}
 function symlink() {
 	target=$1
 	link_name=$2
@@ -15,7 +39,20 @@ function symlink() {
 		return $?
 	fi
 
-	powershell.exe -c "cmd.exe /c mklink /J $link_name $target"
+	win_symlink $target $link_name
+	return $?
+}
+function symlink_force() {
+	target=$1
+	link_name=$2
+
+	if ! is_windows; then
+		ln -frs $target $link_name
+		return $?
+	fi
+
+	rm -rf $link_name
+	win_symlink $target $link_name
 }
 function exists() {
 	if [ -z "`command -v $1`" ]; then
