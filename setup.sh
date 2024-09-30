@@ -52,7 +52,7 @@ if [ ! -d "plugins/$version" ]; then
 
 	if [ "${link_plugins^^}" == "Y" ]; then
 		mkdir -p "plugins/$version"
-		ln -rs "plugins/*.jar" "plugins/$version"
+		symlink "plugins/*.jar" "plugins/$version"
 
 		# print plugin count
 		plugin_count=`ls "plugins/$version" | wc -l`
@@ -84,13 +84,13 @@ fi
 mkdir -p "$server_dir"
 
 echo "linking server and plugins"
-ln -frs "versions/$version.jar" "$server_dir/server.jar"
+symlink_force "versions/$version.jar" "$server_dir/server.jar"
 
 link_dir=${link_dir:-Y}
 
 if [ "${link_dir^^}" == "Y" ]; then
 	mkdir -p "plugins/$version"
-	ln -frs "plugins/$version" "$server_dir/plugins"
+	symlink_force "plugins/$version" "$server_dir/plugins"
 else
 	mkdir -p "$server_dir/plugins"
 fi
