@@ -95,6 +95,14 @@ else
 	mkdir -p "$server_dir/plugins"
 fi
 
+echo "Select any utility scripts you want to link, continue with q"
+util_dir="utils"
+util_files=`ask_user_select_files $util_dir '*.sh' "Select file: "`
+for file in $util_files; do
+	echo -e "\033[38;5;8mlinking $util_dir/$file...\033[0m"
+	symlink_force "utils/$file" "$server_dir/$file"
+done
+
 
 # copy files to intermediary directory
 intermed="$server_dir/temp"

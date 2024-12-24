@@ -5,5 +5,5 @@
 /plugins/*/.*
 /plugins/*
 /versions/*.jar
-/utils
+/utils/*.sh
 /defaults/ops.json

@@ -84,6 +84,44 @@ function is_fd_valid() {
 	return 1
 }
 
+function ask_user_select_files() {
+	subdir="$1"
+	pattern="$2"
+	previous_dir=`pwd`
+	if [ ! -z "$subdir" ]; then
+		cd $subdir
+	fi
+
+	PS3="$3"
+	default_prompt="Select a file or type q to quit: "
+
+	PS3=${PS3:-$default_prompt}
+
+	selected_files=()
+	selecting="true"
+	while [ ! -z $selecting ]; do
+		files=()
+		# Only list the files that have not been selected
+		for file in $pattern; do
+			[[ ! " ${selected_files[*]} " =~ " $file " ]] && files+=($file)
+		done
+		if [ -z $files ]; then
+			break
+		fi
+
+		select file in "${files[@]}"; do
+			if [[ -n $file ]]; then
+				echo $file
+				selected_files+=("$file")
+				break
+			fi
+			selecting=""
+			break
+		done
+	done
+	cd $previous_dir
+}
+
 get_latest_version() {
 	require sed
 
