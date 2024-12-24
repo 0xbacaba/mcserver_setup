@@ -12,7 +12,7 @@ cd $setup_dir
 latest=`get_latest_version`
 
 if [ -z "$latest" ]; then
-	echo -en "\e[33mwarning: no server executables found. Would you like to install paper? [Y/n] \e[0m"
+	echo -en "\033[33mwarning: no server executables found. Would you like to install paper? [Y/n] \033[0m"
 	read install_paper
 	install_paper=${install_paper:-Y}
 
@@ -32,7 +32,7 @@ read -p "Version [$latest]: " version
 version=${version:-$latest}
 
 if [ ! -f "versions/$version.jar" ]; then
-	echo -en "\e[33mwarning: $version doesn't exist. Install paper? [Y/n] \e[0m"
+	echo -en "\033[33mwarning: $version doesn't exist. Install paper? [Y/n] \033[0m"
 	read install_paper
 	install_paper=${install_paper:-Y}
 
@@ -46,7 +46,7 @@ if [ ! -f "versions/$version.jar" ]; then
 fi
 
 if [ ! -d "plugins/$version" ]; then
-	echo -e "\e[33mwarning: no plugins for this version\e[0m"
+	echo -e "\033[33mwarning: no plugins for this version\033[0m"
 	read -p "Link default plugins? [Y/n] " link_plugins
 	link_plugins=${link_plugins:-Y}
 
@@ -57,9 +57,9 @@ if [ ! -d "plugins/$version" ]; then
 		# print plugin count
 		plugin_count=`ls "plugins/$version" | wc -l`
 		if [ "$plugin_count" == "1" ]; then
-			echo -e "\e[32m1 plugin linked\e[0m"
+			echo -e "\033[32m1 plugin linked\033[0m"
 		else
-			echo -e "\e[32m$plugin_count plugins linked\e[0m"
+			echo -e "\033[32m$plugin_count plugins linked\033[0m"
 		fi
 	else
 		read -p "Create linked directory? [Y/n] " link_dir
@@ -72,7 +72,7 @@ server_dir="../$name"
 
 # check if $server_dir is already a directory or file
 if [ -d "$server_dir" ] || [ -f "$server_dir" ]; then
-	echo -en "\e[33mwarning: directory already exists. Continue? [Y/n]\e[0m "
+	echo -en "\033[33mwarning: directory already exists. Continue? [Y/n]\033[0m "
 	read ignore_warning
 	ignore_warning=${ignore_warning:-Y}
 
@@ -101,7 +101,7 @@ intermed="$server_dir/temp"
 mkdir -p "$intermed"
 
 for file in "defaults"/*; do
-	echo -e "\e[38;5;8mcopying $file...\e[0m"
+	echo -e "\033[38;5;8mcopying $file...\033[0m"
 	newfile="$intermed/`basename $file`"
 	cp -r $file $newfile
 done
@@ -121,4 +121,4 @@ done
 mv "$intermed"/* "$server_dir"
 rmdir $intermed
 
-echo -e "\e[32msetup complete\e[0m"
+echo -e "\033[32msetup complete\033[0m"
