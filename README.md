@@ -4,7 +4,7 @@
 ### Usage:
 ```bash
 cd $server_root
-git clone https://github.com/LetsDuck2210/mcserver_setup setup
+git clone https://github.com/0xbacaba/mcserver_setup setup
 
 
 # Install server versions to $server_root/setup/versions. 
