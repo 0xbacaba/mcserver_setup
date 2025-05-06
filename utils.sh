@@ -60,6 +60,15 @@ function exists() {
 	fi
 	return 0
 }
+function directory_contains() {
+	local directory="$1"
+	local glob="$2"
+
+	if [ -z "`find "$directory" -maxdepth 1 -name "$glob"`" ]; then
+		return 1
+	fi
+	return 0
+}
 function require() {
 	local program=$1
 
@@ -87,6 +96,11 @@ function is_fd_valid() {
 function ask_user_select_files() {
 	subdir="$1"
 	pattern="$2"
+
+	if ! directory_contains "$subdir" "$pattern" then
+		return
+	fi
+
 	previous_dir=`pwd`
 	if [ ! -z "$subdir" ]; then
 		cd $subdir

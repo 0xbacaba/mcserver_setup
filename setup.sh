@@ -47,21 +47,26 @@ fi
 
 if [ ! -d "plugins/$version" ]; then
 	echo -e "\033[33mwarning: no plugins for this version\033[0m"
-	read -p "Link default plugins? [Y/n] " link_plugins
-	link_plugins=${link_plugins:-Y}
 
-	if [ "${link_plugins^^}" == "Y" ]; then
-		mkdir -p "plugins/$version"
-		symlink "plugins/*.jar" "plugins/$version"
+	if directory_contains "plugins" '*.jar' then
+		read -p "Link default plugins? [Y/n] " link_plugins
+		link_plugins=${link_plugins:-Y}
 
-		# print plugin count
-		plugin_count=`ls "plugins/$version" | wc -l`
-		if [ "$plugin_count" == "1" ]; then
-			echo -e "\033[32m1 plugin linked\033[0m"
-		else
-			echo -e "\033[32m$plugin_count plugins linked\033[0m"
+		if [ "${link_plugins^^}" == "Y" ]; then
+			mkdir -p "plugins/$version"
+			symlink "plugins/*.jar" "plugins/$version"
+
+			# print plugin count
+			plugin_count=`ls "plugins/$version" | wc -l`
+			if [ "$plugin_count" == "1" ]; then
+				echo -e "\033[32m1 plugin linked\033[0m"
+			else
+				echo -e "\033[32m$plugin_count plugins linked\033[0m"
+			fi
 		fi
-	else
+	fi
+
+	if [ "${link_plugins^^}" != "Y" ]; then
 		read -p "Create linked directory? [Y/n] " link_dir
 	fi
 fi
