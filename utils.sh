@@ -1,12 +1,18 @@
 #!/bin/bash
 
-function is_windows() {
-	if [[ `uname -o` == *"Linux"* ]]; then
-		return 1
-	fi
-
-	return 0
+function get_os() {
+	case "`uname -s`" in
+		Linux)
+			echo "linux" ;;
+		Darwin)
+			echo "macos" ;;
+		MINGW*|MSYS*|CYGWIN*|Windows_NT)
+			echo "windows" ;;
+		*)
+			echo "unknown" ;;
+	esac
 }
+
 function to_win_path() {
 	path=$1
 
@@ -32,27 +38,33 @@ function win_symlink() {
 	return $?
 }
 function symlink() {
-	target=$1
-	link_name=$2
-	if ! is_windows; then
-		ln -rs $target $link_name
-		return $?
-	fi
+	local target=$1
+	local link_name=$2
 
-	win_symlink $target $link_name
-	return $?
+	local previous_dir="`pwd`"
+	cd `dirname "$link_name"`
+	case "`get_os`" in
+		linux|macos)
+			ln -s $target $link_name
+			cd "$previous_dir"
+			return $?
+			;;
+		windows)
+			win_symlink $target $link_name
+			cd "$previous_dir"
+			return $?
+			;;
+		*)
+			cd "$previous_dir"
+			return 1
+	esac
 }
 function symlink_force() {
-	target=$1
-	link_name=$2
-
-	if ! is_windows; then
-		ln -frs $target $link_name
-		return $?
-	fi
+	local target=$1
+	local link_name=$2
 
 	rm -rf $link_name
-	win_symlink $target $link_name
+	symlink "$target" "$link_name"
 }
 function exists() {
 	if [ -z "`command -v $1`" ]; then
@@ -91,6 +103,19 @@ function is_fd_valid() {
 		return 0
 	fi
 	return 1
+}
+function upper() {
+	local text="$1"
+
+	echo "$text" | tr '[:lower:]' '[:upper:]'
+}
+
+function sed_inplace() {
+	local script="$1"
+	local file="$2"
+
+	local tempfile="`mktemp`"
+	sed "$script" "$file" > "$tempfile" && mv "$tempfile" "$file"
 }
 
 function ask_user_select_files() {
@@ -163,7 +188,7 @@ install_paper_version() {
 	read proceed
 	local proceed=${proceed:-Y}
 
-	if [ "${proceed^^}" != "Y" ]; then
+	if [ "`upper "$proceed"`" != "Y" ]; then
 		return 1
 	fi
 

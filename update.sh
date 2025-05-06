@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ensure starting in setup directory
-setup_dir=$(echo $0 | sed "s/`basename $0`\$//")
+setup_dir=$(dirname "$0")
 cd $setup_dir
 
 
@@ -26,7 +26,7 @@ if [ "$mc_version" == "all" ]; then
 			echo -en "\033[33mwarning: an error occured. Continue? [Y/n] \033[0m"
 			read cont
 			cont=${cont:-Y}
-			if [ "${cont^^}" != "Y" ]; then
+			if [ "`upper "$cont"`" != "Y" ]; then
 				exit
 			fi
 		fi
