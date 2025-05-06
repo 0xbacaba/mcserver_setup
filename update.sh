@@ -23,7 +23,7 @@ fi
 if [ "$mc_version" == "all" ]; then
 	for file in versions/*.jar; do
 		if [ "$?" != "0" ]; then
-			echo -en "\e[33mwarning: an error occured. Continue? [Y/n] \e[0m"
+			echo -en "\033[33mwarning: an error occured. Continue? [Y/n] \033[0m"
 			read cont
 			cont=${cont:-Y}
 			if [ "${cont^^}" != "Y" ]; then

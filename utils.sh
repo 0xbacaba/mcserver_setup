@@ -25,7 +25,7 @@ function win_symlink() {
 	elif [ -d $target ]; then
 		powershell.exe -c "cmd.exe /c mklink /J $win_link_name $win_target"
 	else
-		echo -en "\e[31merror: $target doesn't exist\e[0m"
+		echo -en "\033[31merror: $target doesn't exist\033[0m"
 		return 1
 	fi
 
@@ -73,7 +73,7 @@ function require() {
 	local program=$1
 
 	if ! exists $program; then
-		echo -e "\e[31merror: $program is required but doesn't exist\e[0m" >&2
+		echo -e "\033[31merror: $program is required but doesn't exist\033[0m" >&2
 		exit
 	fi
 }
@@ -81,7 +81,7 @@ function require_optional() {
 	local program=$1
 
 	if ! exists $program; then
-		echo -e "\e[33mwarning: $program doesn't exist, some features might not be available\e[0m" >&2
+		echo -e "\033[33mwarning: $program doesn't exist, some features might not be available\033[0m" >&2
 	fi
 }
 function is_fd_valid() {
@@ -146,7 +146,7 @@ install_paper_version() {
 	local version=$1
 
 	if ! exists curl || ! exists jq; then
-		echo -e "\e[31merror: missing requirements to install paper. Please install \e[34mcurl\e[31m and \e[34mjq\e[0m"
+		echo -e "\033[31merror: missing requirements to install paper. Please install \033[34mcurl\033[31m and \033[34mjq\033[0m"
 		return 1
 	fi
 
@@ -156,10 +156,10 @@ install_paper_version() {
 	local latest_build=`curl "$paperapi/versions/$version/builds" -Ls | jq '.builds[-1].build'`
 
 	if [ "$latest_build" == "null" ]; then
-		echo -e "\e[31merror: no build for this version\e[0m"
+		echo -e "\033[31merror: no build for this version\033[0m"
 		return 1
 	fi
-	echo -en "\e[32mgot build $latest_build. Proceed? [Y/n] \e[0m"
+	echo -en "\033[32mgot build $latest_build. Proceed? [Y/n] \033[0m"
 	read proceed
 	local proceed=${proceed:-Y}
 
@@ -171,10 +171,10 @@ install_paper_version() {
 	curl -fsSL "$paperapi/versions/$version/builds/$latest_build/downloads/paper-$version-$latest_build.jar" -o versions/$version.jar
 	
 	if [ "$?" != "0" ]; then
-		echo -e "\e[31minstallation failed: $?\e[0m"
+		echo -e "\033[31minstallation failed: $?\033[0m"
 		return 1
 	fi
 
-	echo -e "\e[32minstallation successful\e[0m"
+	echo -e "\033[32minstallation successful\033[0m"
 	return 0
 }
