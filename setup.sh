@@ -48,7 +48,7 @@ fi
 if [ ! -d "plugins/$version" ]; then
 	echo -e "\033[33mwarning: no plugins for this version\033[0m"
 
-	if directory_contains "plugins" '*.jar' then
+	if directory_contains "plugins" '*.jar'; then
 		read -p "Link default plugins? [Y/n] " link_plugins
 		link_plugins=${link_plugins:-Y}
 
@@ -100,13 +100,15 @@ else
 	mkdir -p "$server_dir/plugins"
 fi
 
-echo "Select any utility scripts you want to link, continue with q"
 util_dir="utils"
-util_files=`ask_user_select_files $util_dir '*.sh' "Select file: "`
-for file in $util_files; do
-	echo -e "\033[38;5;8mlinking $util_dir/$file...\033[0m"
-	symlink_force "utils/$file" "$server_dir/$file"
-done
+if directory_contains "$util_dir" '*.sh'; then
+	echo "Select any utility scripts you want to link, continue with q"
+	util_files=`ask_user_select_files $util_dir '*.sh' "Select file: "`
+	for file in $util_files; do
+		echo -e "\033[38;5;8mlinking $util_dir/$file...\033[0m"
+		symlink_force "../$setup_dir_name/utils/$file" "$server_dir/$file"
+	done
+fi
 
 
 # copy files to intermediary directory

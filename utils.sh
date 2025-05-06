@@ -97,8 +97,8 @@ function ask_user_select_files() {
 	subdir="$1"
 	pattern="$2"
 
-	if ! directory_contains "$subdir" "$pattern" then
-		return
+	if ! directory_contains "$subdir" "$pattern"; then
+		return 0
 	fi
 
 	previous_dir=`pwd`
